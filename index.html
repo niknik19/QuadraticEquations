@@ -119,9 +119,9 @@ $(function() {
     var x1 = (-1 * b + Math.sqrt(d)) / (2 * a);
     var x2 = (-1 * b - Math.sqrt(d)) / (2 * a);
 
-    x1 = isNaN(x1) ? '\u26d4' : x1;
-    x2 = isNaN(x2) ? '\u26d4' : x2;
-
+    x1 = getDisplayValue(x1);
+    x2 = getDisplayValue(x2);
+    
     $("#D").html(d);
     $("#X1").html(x1);
     $("#X2").html(x2);
@@ -148,6 +148,18 @@ $(function() {
     $("#X1-bottom").html(`2 * ${a}`);
     $("#X2-top").html(`${-b} - 	&radic;${d}`);
     $("#X2-bottom").html(`2 * ${a}`);
+  }
+
+  function getDisplayValue (num) {
+    var error = '\u26d4';
+    var infinity = '\u221E';
+
+    switch (true) {
+      case(num == Number.POSITIVE_INFINITY): { return infinity; } 
+      case(num == Number.NEGATIVE_INFINITY): { return '-' + infinity; } 
+      case(isNaN(num)): { return error; } 
+      default: { return num; }
+    }
   }
 
   function simplifyTop(b, d, gcd, dSquareFactor, func, sign) {
@@ -179,8 +191,14 @@ $(function() {
     && /^[+-]?\d*\.?\d*$/.test(stringValue);
   }
 
+  function isValidParsedNumber(num) {
+    return num != Number.POSITIVE_INFINITY 
+    && num != Number.NEGATIVE_INFINITY
+    && !isNaN(num);
+  }
+
   function ValidateInput($input) {
-    var isValid = IsValidNumber($input.val());
+    var isValid = IsValidNumber($input.val()) && isValidParsedNumber(parseFloat($input.val()));
 
     if (isValid) {
       $input.removeClass("invalid");
@@ -192,8 +210,7 @@ $(function() {
   }
 
   var MathHelper = new MathHelper(); 
-  // debugger;
-  // MathHelper.GetGreatestCommontDivisor([12, 6, 24]);
+
   function MathHelper() {
     var self = this;
     
