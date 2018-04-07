@@ -1,0 +1,312 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<div class="input-group mb-3">
+  <input id="A" type="text" class="form-control input-position" placeholder="a" aria-label="a" aria-describedby="basic-addon1">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">
+    	X<sup>2</sup>
+    </span>
+  </div>
+  <input  id="B" type="text" class="form-control input-position" placeholder="b" aria-label="a" aria-describedby="basic-addon1">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">X</span>
+  </div>
+  <input  id="C"  type="text" class="form-control input-position" placeholder="c" aria-label="c" aria-describedby="basic-addon1">
+  <input value="= 0" readonly="" class="form-control input-position" disabled="">
+</div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">D = </span>
+  </div>
+  <div class="input-group-append">
+      <span  id="D" class="input-group-text" id="basic-addon1"></span>
+  </div>
+</div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text" id="basic-addon1">X<sub>1</sub> = </span>
+  </div>
+  <div class="input-group-prepend">
+    <span class="fraction input-group-text">
+      <span id="X1-top" class="top"></span>
+      <span id="X1-bottom" class="bottom"> </span>
+    </span>
+  </div>
+
+  <div class="input-group-prepend interim-calculations invisible">
+    <span class="input-group-text" id="basic-addon1">X<sub>1</sub> = </span>
+  </div>
+  <div class="input-group-prepend interim-calculations invisible">
+    <span class="fraction input-group-text">
+      <span id="X1-top-ic" class="top"></span>
+      <span id="X1-bottom-ic" class="bottom"> </span>
+    </span>
+  </div>
+
+  <div class="input-group-append">
+      <span class="input-group-text" id="basic-addon1"> = </span>
+  </div>
+  <div class="input-group-append">
+      <span id="X1" class="input-group-text" id="basic-addon1"></span>
+  </div>
+</div>
+
+<div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="basic-addon1">X<sub>2</sub> = </span>
+    </div>
+    <div class="input-group-prepend">
+      <span class="fraction input-group-text">
+        <span id="X2-top" class="top"></span>
+        <span id="X2-bottom" class="bottom"> </span>
+      </span>
+    </div>
+
+    <div class="input-group-prepend interim-calculations invisible">
+      <span class="input-group-text" id="basic-addon1">X<sub>2</sub> = </span>
+    </div>
+    <div class="input-group-prepend interim-calculations invisible">
+      <span class="fraction input-group-text">
+        <span id="X2-top-ic" class="top"></span>
+        <span id="X2-bottom-ic" class="bottom"> </span>
+      </span>
+    </div>
+
+    <div class="input-group-append">
+        <span class="input-group-text" id="basic-addon1"> = </span>
+    </div>
+    <div class="input-group-append">
+        <span  id="X2" class="input-group-text" id="basic-addon1"></span>
+    </div>
+  </div>
+
+</body>
+
+<script>
+$(function() {
+  $("#A, #B, #C").on('input', function() {
+    
+    var fields = [$("#A"), $("#B"), $("#C")];
+
+    var isValid = fields.reduce((result, x) => result & ValidateInput(x), true);
+
+    if (!isValid) {
+      ResetValues(); 
+    } else {
+      CalculateValues_stub();
+    }
+
+  });
+
+
+  function CalculateValues_stub() {
+    var a = parseFloat($("#A").val());
+    var b = parseFloat($("#B").val());
+    var c = parseFloat($("#C").val());
+
+    var d = b * b - 4 * a * c;
+    var x1 = (-1 * b + Math.sqrt(d)) / (2 * a);
+    var x2 = (-1 * b - Math.sqrt(d)) / (2 * a);
+
+    x1 = isNaN(x1) ? '\u26d4' : x1;
+    x2 = isNaN(x2) ? '\u26d4' : x2;
+
+    $("#D").html(d);
+    $("#X1").html(x1);
+    $("#X2").html(x2);
+
+    var gcd = 1;
+    if (d >= 0) {
+      var dSquareFactor = MathHelper.GetSquareFactor(d);
+      if (dSquareFactor > 0) {
+        var gcd = MathHelper.GetGreatestCommontDivisor([a * 2, b, Math.sqrt(dSquareFactor)]);
+      }
+    }
+
+    if (gcd != 1) {
+      $(".interim-calculations").removeClass("invisible");
+      $("#X1-top-ic").html(simplifyTop(b, d, gcd, dSquareFactor, (a, b) => a + b, "+"));
+      $("#X1-bottom-ic").html(`${(a * 2)/gcd}`);
+      $("#X2-top-ic").html(simplifyTop(b, d, gcd, dSquareFactor, (a, b) => a - b, "-"));
+      $("#X2-bottom-ic").html(`${(a * 2)/gcd}`);
+    } else {
+      $(".interim-calculations").addClass("invisible");
+    }
+
+    $("#X1-top").html(`${-b} + 	&radic;${d}`);
+    $("#X1-bottom").html(`2 * ${a}`);
+    $("#X2-top").html(`${-b} - 	&radic;${d}`);
+    $("#X2-bottom").html(`2 * ${a}`);
+  }
+
+  function simplifyTop(b, d, gcd, dSquareFactor, func, sign) {
+    if (d/dSquareFactor == 1) {
+      return `${func(-b/gcd, Math.sqrt(dSquareFactor) / gcd)}`
+    } else {
+      return `${-b/gcd} ${sign} ${Math.sqrt(dSquareFactor) / gcd}	* &radic;${d/dSquareFactor}`
+    }
+
+  }
+
+  function ResetValues () {
+    $("#D").html('');
+    
+    $("#X1").html('');
+    $("#X1-top").html('');
+    $("#X1-bottom").html('');
+
+    $("#X2").html('');
+    $("#X2-top").html('');
+    $("#X2-bottom").html('');
+
+    $(".interim-calculations").addClass("invisible");
+  }
+
+  function IsValidNumber(stringValue)  {
+    return stringValue != null 
+    && stringValue.length > 0 
+    && /^[+-]?\d*\.?\d*$/.test(stringValue);
+  }
+
+  function ValidateInput($input) {
+    var isValid = IsValidNumber($input.val());
+
+    if (isValid) {
+      $input.removeClass("invalid");
+    } else {
+      $input.addClass("invalid");
+    }
+
+    return isValid;
+  }
+
+  var MathHelper = new MathHelper(); 
+  // debugger;
+  // MathHelper.GetGreatestCommontDivisor([12, 6, 24]);
+  function MathHelper() {
+    var self = this;
+    
+    self.GetPrimeFactors = function(num) {
+      var result = [];
+
+      var i = 2;
+      while (i < num + 1) {
+        if (num % i == 0) {
+          result.push(i);
+          num = num / i;
+        } else {
+          i++;
+        }
+      }
+
+      return result;
+    }
+
+    self.GetSquareFactor = function(num) {
+      var primeFactors = self.GetPrimeFactors(num).sort((a, b) => a - b);
+      
+      var squareFactor = 1;
+      var i = 0;
+      while (i < primeFactors.length - 1) {
+        if (primeFactors[i] == primeFactors[i + 1]) {
+          squareFactor *= primeFactors[i] * primeFactors[i];
+          i = i + 2;
+        } else {
+          i = i + 1;
+        }
+      }
+      
+      return squareFactor;
+    }
+
+    self.GetGreatestCommontDivisor = function(nums) {
+      return nums       
+        .map(n => self.GetPrimeFactors(Math.abs(n)))
+        .reduce((acc, pv) => intersect(acc, pv))
+        .reduce((acc, v) => acc * v, 1);
+    }
+
+    function intersect(a, b) {
+      var t;
+      if (b.length > a.length) { 
+        t = b;
+        b = a; 
+        a = t;
+      }
+
+      var a1 = a.slice();
+      var b1 = b.slice();
+
+      var result = [];
+      var aIndex = 0;
+      while(aIndex < a1.length) {
+        var bIndex; 
+        if ((bIndex = b1.indexOf(a1[aIndex])) > -1)
+        {
+          result.push(a1[aIndex]);
+          a1.splice(aIndex, 1);
+          b1.splice(bIndex, 1);
+        } else {
+          aIndex++;
+        }
+      }
+
+      return result;
+    }
+
+    return self;  
+  }
+
+
+})
+
+</script>
+
+<style>
+.input-position {
+    width: 80px !important;
+    display: inline-block;
+    flex: none !important;
+}
+
+.input-position-result {
+    min-width: 60px !important;
+    display: inline-block;
+    flex: none !important;
+}
+
+.fraction, .top, .bottom {
+    padding: 0 5px;    
+}
+
+.fraction {
+    display: inline-block;
+    text-align: center;    
+}
+
+.bottom{
+    border-top: 1px solid #000;
+    display: block;
+}
+
+input.invalid {
+  border-color: lightcoral;
+}
+
+.invisible {
+  display: none;
+}
+</style>
+
+</html>
